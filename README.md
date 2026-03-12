@@ -102,3 +102,24 @@ monte-carlo-pricing-simulation/
 - add a reproducible experiment notebook in `notebooks/`
 - store result charts and tables under `outputs/`
 - summarize findings for portfolio presentation in `docs/` and `presentation/`
+
+
+## Korean Research Package (KAIST-DFMBA KMS Style Adaptation)
+
+The repository now includes a reusable Korean documentation and experiment package aligned with this repo's structure.
+
+- Core pricing engine: `src/monte_carlo_engine.py`
+- Scenario runner: `src/run_pricing_experiment.py`
+- Sample scenario data: `data/sample/option_scenarios.csv`
+- Korean guide: `docs/kms_adapted_research_package_ko.md`
+- Korean workflow note: `references/lecture-notes/monte_carlo_workflow_note_ko.md`
+
+Run:
+
+```bash
+python -m src.run_pricing_experiment
+```
+
+Outputs:
+- `outputs/tables/pricing_results_sample.csv`
+- `outputs/charts/pricing_results_sample.png`
