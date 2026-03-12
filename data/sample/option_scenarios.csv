@@ -1,0 +1,5 @@
+scenario_id,option_type,spot,strike,maturity,rate,volatility,n_paths,n_steps,seed
+baseline_call,call,100,100,1.0,0.03,0.2,50000,252,42
+high_vol_call,call,100,100,1.0,0.03,0.35,50000,252,42
+deep_itm_put,put,80,100,0.5,0.03,0.25,50000,126,7
+long_maturity_call,call,100,105,2.0,0.03,0.22,60000,504,99

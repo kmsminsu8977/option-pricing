@@ -1,0 +1,52 @@
+# 몬테카를로 파생상품 가격 연구 패키지 (KMS 브랜치 스타일 반영)
+
+## 1) 문서 목적
+
+본 문서는 KAIST-DFMBA 레포의 `kms` 브랜치에서 일반적으로 사용되는 **학습-실험-결과 분리형 구성 철학**을 현재 저장소 구조에 맞춰 이식하기 위한 운영 가이드입니다.
+
+핵심 목표는 다음과 같습니다.
+
+1. 입력 가정과 산출 결과를 명확히 분리
+2. 코드(`src`)와 산출물(`outputs`)을 재현 가능한 형태로 연결
+3. 포트폴리오 제출 시 바로 설명 가능한 스토리라인 확보
+
+## 2) 현재 저장소에 맞춘 산출물 흐름
+
+```text
+sample 입력(csv) -> 실험 실행 스크립트 -> 결과 테이블(csv) + 결과 차트(png)
+```
+
+- 입력: `data/sample/option_scenarios.csv`
+- 실행: `python -m src.run_pricing_experiment`
+- 출력:
+  - `outputs/tables/pricing_results_sample.csv`
+  - `outputs/charts/pricing_results_sample.png`
+
+## 3) 구현된 엔진 구성
+
+- `src/monte_carlo_engine.py`
+  - 시장 가정, 계약 조건, 시뮬레이션 설정을 각각 dataclass로 분리
+  - GBM 기반 만기 가격 분포 시뮬레이션
+  - 유럽형 콜/풋 페이오프 계산
+  - 할인 가격, 표준오차, 95% 신뢰구간 계산
+
+- `src/run_pricing_experiment.py`
+  - CSV 입력 시나리오 일괄 처리
+  - 테이블 및 차트 산출 자동화
+
+## 4) 연구 보고서 작성 시 권장 해석 프레임
+
+1. **가격 레벨**: 시나리오별 평균 추정가격 비교
+2. **불확실성 크기**: 신뢰구간 폭 및 표준오차 비교
+3. **민감도 분석 포인트**:
+   - 변동성 증가 시 옵션 가치 변화
+   - 만기 증가 시 시간가치 확대 여부
+   - in/out-of-the-money 구간별 결과 차이
+
+## 5) 향후 확장 작업 제안
+
+- 분산축소(Antithetic / Control Variate) 추가
+- 블랙-숄즈 해석해와 비교 검증 리포트 추가
+- Greeks(Delta/Vega) 수치 근사 모듈화
+- 시나리오 생성기(금리/변동성 격자 자동 생성) 추가
+
