@@ -19,7 +19,7 @@ import numpy as np
 class MarketAssumption:
     """시장 가정 입력값.
 
-    Attributes:
+    속성:
         spot: 현재 기초자산 가격(S0)
         rate: 무위험 이자율(r)
         volatility: 연율 변동성(sigma)
@@ -34,7 +34,7 @@ class MarketAssumption:
 class ContractSpec:
     """파생상품 계약 조건.
 
-    Attributes:
+    속성:
         strike: 행사가격(K)
         maturity: 잔존만기(년)
         option_type: 옵션 유형(call 또는 put)
@@ -58,7 +58,7 @@ class SimulationSpec:
 class PricingResult:
     """가격 산출 결과.
 
-    Attributes:
+    속성:
         price: 할인된 몬테카를로 추정 가격
         stdev: 할인된 페이오프 표준편차
         stderr: 표준오차

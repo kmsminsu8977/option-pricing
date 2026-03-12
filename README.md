@@ -1,78 +1,78 @@
-# Monte Carlo Pricing Simulation
+# 몬테카를로 가격 시뮬레이션
 
-Portfolio-oriented research repository for derivative pricing under uncertainty. This project is structured to show the full research story first: the market problem, data assumptions, modeling approach, numerical results, and how the work can extend into production finance workflows.
+불확실한 시장 환경에서 파생상품 가격을 추정하기 위한 포트폴리오형 연구 저장소입니다. 이 프로젝트는 **문제 정의 → 데이터 가정 → 모델링 방법론 → 수치 결과 → 실무 확장성** 흐름이 한눈에 보이도록 구성되어 있습니다.
 
-## 1. Problem Definition
+## 1. 문제 정의
 
-Traditional closed-form pricing is efficient when product structure and market assumptions remain simple. In practice, path dependency, custom payoffs, and scenario-based risk analysis quickly make analytic solutions less useful.  
-This repository studies how Monte Carlo simulation can be used to estimate derivative value under stochastic price dynamics and how the same framework can scale toward risk, valuation, and strategy applications.
+폐형식(Closed-form) 가격 모형은 상품 구조와 시장 가정이 단순할 때는 매우 효율적입니다. 그러나 실제 실무에서는 경로의존성, 맞춤형 페이오프, 시나리오 기반 위험분석이 빈번해 분석해만으로는 한계가 발생합니다.  
+본 저장소는 확률적 가격 동학 하에서 **몬테카를로 시뮬레이션**으로 파생상품의 공정가치를 추정하고, 단일 가격값을 넘어서는 실무적 인사이트를 도출하는 과정을 다룹니다.
 
-Core research question:
+핵심 연구 질문:
 
-> How reliably can Monte Carlo simulation price a derivative under configurable market assumptions, and what practical insights emerge from the simulation output beyond a single fair value?
+> 설정 가능한 시장 가정 아래에서 몬테카를로 시뮬레이션은 파생상품 가격을 얼마나 안정적으로 추정할 수 있으며, 그 결과로부터 어떤 실무적 통찰을 얻을 수 있는가?
 
-## 2. Data
+## 2. 데이터
 
-This project is designed to support both synthetic and market-linked workflows.
+이 프로젝트는 합성 데이터와 시장 연계 데이터 모두를 수용할 수 있도록 설계되었습니다.
 
-- `data/raw/`: original inputs such as market snapshots, volatility assumptions, rates, or externally collected reference data
-- `data/processed/`: cleaned and transformed datasets ready for modeling
-- `data/sample/`: lightweight example inputs and documentation for reproducible demos
+- `data/raw/`: 시장 스냅샷, 변동성 가정, 금리 등 원본 입력 데이터
+- `data/processed/`: 모델링에 즉시 사용할 수 있도록 정제·가공된 데이터
+- `data/sample/`: 재현 가능한 데모 실행을 위한 경량 샘플 데이터
 
-Typical inputs for this project:
+주요 입력 변수 예시:
 
-- underlying asset price
-- strike price and maturity
-- risk-free rate
-- volatility estimate
-- simulation count and time-step configuration
+- 기초자산 현재 가격
+- 행사가격 및 잔존만기
+- 무위험 이자율
+- 변동성 추정치
+- 시뮬레이션 경로 수 및 시간 분할 수
 
-## 3. Methodology
+## 3. 방법론
 
-The baseline workflow is organized around a reusable pricing pipeline:
+기본 워크플로우는 재사용 가능한 가격 산출 파이프라인으로 구성됩니다.
 
-1. Define contract and market parameters
-2. Generate simulated price paths under a chosen stochastic process
-3. Evaluate payoff across simulated paths
-4. Discount expected payoff to present value
-5. Compare outputs across scenarios, sensitivities, and simulation settings
+1. 계약 조건 및 시장 가정 정의
+2. 확률과정 가정 하에서 기초자산 경로 생성
+3. 경로별 만기 페이오프 평가
+4. 기대 페이오프를 현재가치로 할인
+5. 시나리오/민감도/시뮬레이션 설정별 결과 비교
 
-Expected methodology extensions:
+예상 확장 방법론:
 
-- Geometric Brownian Motion baseline
-- variance reduction techniques
-- convergence diagnostics
-- sensitivity analysis by volatility, maturity, and strike
-- comparison with benchmark analytical pricing where available
+- 기하 브라운 운동(GBM) 기반 기준 모형
+- 분산 축소 기법
+- 수렴 진단
+- 변동성·만기·행사가격 민감도 분석
+- 가능한 경우 해석해 벤치마크와 비교
 
-## 4. Results
+## 4. 결과
 
-Outputs are separated from code and documentation so the repository remains readable and portfolio-ready.
+코드와 산출물을 분리해 저장소 가독성과 포트폴리오 완성도를 높였습니다.
 
-- `outputs/charts/`: convergence plots, path visualizations, scenario comparisons
-- `outputs/tables/`: pricing summaries, sensitivity tables, experiment logs
-- `outputs/images/`: figures intended for README, reports, or presentation material
+- `outputs/charts/`: 수렴 그래프, 경로 시각화, 시나리오 비교 그래프
+- `outputs/tables/`: 가격 요약표, 민감도 테이블, 실험 로그
+- `outputs/images/`: README/보고서/발표용 이미지 자산
 
-Recommended result narrative:
+권장 결과 해석 항목:
 
-- estimated derivative price
-- confidence interval or simulation stability
-- parameter sensitivity
-- interpretation of model limitations
+- 추정 파생상품 가격
+- 신뢰구간 또는 시뮬레이션 안정성 지표
+- 파라미터 민감도
+- 모형 한계에 대한 해석
 
-## 5. Practical Expansion
+## 5. 실무 확장
 
-This repository is intended as a foundation for real finance workflows rather than a one-off class assignment.
+이 저장소는 일회성 과제가 아니라 실무형 금융 분석으로 확장 가능한 기반을 목표로 합니다.
 
-Possible extensions:
+가능한 확장 방향:
 
-- exotic option pricing
-- structured product payoff simulation
-- VaR / Expected Shortfall scenario engines
-- stress testing under custom market regimes
-- pricing API or dashboard integration for internal tooling
+- 이색옵션 가격 산출
+- 구조화 상품 페이오프 시뮬레이션
+- VaR / Expected Shortfall 시나리오 엔진
+- 맞춤형 시장 스트레스 테스트
+- 내부 도구용 가격 산출 API 또는 대시보드 연계
 
-## Repository Structure
+## 저장소 구조
 
 ```text
 monte-carlo-pricing-simulation/
@@ -89,37 +89,38 @@ monte-carlo-pricing-simulation/
 `-- archive/
 ```
 
-## Working Principles
+## 운영 원칙
 
-- The README acts as the main project document.
-- Documentation, code, experiments, and results remain physically separated.
-- The structure is reusable for other finance research topics with minimal changes.
-- Every addition should strengthen the flow: problem -> data -> methodology -> results -> practical expansion.
-
-## Next Build Targets
-
-- implement a baseline Monte Carlo option pricer in `src/`
-- add a reproducible experiment notebook in `notebooks/`
-- store result charts and tables under `outputs/`
-- summarize findings for portfolio presentation in `docs/` and `presentation/`
+- README는 프로젝트의 핵심 안내 문서 역할을 합니다.
+- 문서, 코드, 실험, 결과를 물리적으로 분리해 관리합니다.
+- 동일 구조를 다른 금융 리서치 주제로 손쉽게 재사용할 수 있습니다.
+- 모든 추가 작업은 **문제 → 데이터 → 방법론 → 결과 → 실무 확장** 흐름을 강화해야 합니다.
 
 
-## Korean Research Package (KAIST-DFMBA KMS Style Adaptation)
+## 다음 개발 목표
 
-The repository now includes a reusable Korean documentation and experiment package aligned with this repo's structure.
+- `src/`에 기준 몬테카를로 옵션 가격기 고도화
+- `notebooks/`에 재현 가능한 실험 노트북 추가
+- `outputs/`에 결과 차트/테이블 정리
+- `docs/`, `presentation/`에 포트폴리오용 해석 자료 보강
 
-- Core pricing engine: `src/monte_carlo_engine.py`
-- Scenario runner: `src/run_pricing_experiment.py`
-- Sample scenario data: `data/sample/option_scenarios.csv`
-- Korean guide: `docs/kms_adapted_research_package_ko.md`
-- Korean workflow note: `references/lecture-notes/monte_carlo_workflow_note_ko.md`
+## 한국어 연구 패키지 안내 (KAIST-DFMBA KMS 스타일 반영)
 
-Run:
+현재 저장소 구조에 맞춰 재사용 가능한 한국어 문서/실험 패키지를 포함하고 있습니다.
+
+- 핵심 가격 엔진: `src/monte_carlo_engine.py`
+- 시나리오 실행기: `src/run_pricing_experiment.py`
+- 샘플 시나리오 데이터: `data/sample/option_scenarios.csv`
+- 한국어 가이드 문서: `docs/kms_adapted_research_package_ko.md`
+- 한국어 워크플로우 노트: `references/lecture-notes/monte_carlo_workflow_note_ko.md`
+
+실행 명령:
 
 ```bash
 python -m src.run_pricing_experiment
 ```
 
-Outputs:
+산출물:
+
 - `outputs/tables/pricing_results_sample.csv`
 - `outputs/charts/pricing_results_sample.png`
