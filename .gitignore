@@ -35,3 +35,5 @@ outputs/images/*
 !outputs/charts/.gitkeep
 !outputs/tables/.gitkeep
 !outputs/images/.gitkeep
+!outputs/charts/pricing_results_sample.png
+!outputs/tables/pricing_results_sample.csv

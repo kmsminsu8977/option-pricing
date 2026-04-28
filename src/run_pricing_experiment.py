@@ -69,9 +69,9 @@ def save_chart(results: pd.DataFrame, output_path: Path) -> None:
     yerr = [y - results["ci_low"], results["ci_high"] - y]
 
     plt.errorbar(x, y, yerr=yerr, fmt="o", capsize=4)
-    plt.title("시나리오별 몬테카를로 옵션 가격(95% 신뢰구간)")
-    plt.xlabel("시나리오 ID")
-    plt.ylabel("추정 가격")
+    plt.title("Monte Carlo Option Price by Scenario (95% CI)")
+    plt.xlabel("Scenario ID")
+    plt.ylabel("Estimated Price")
     plt.grid(alpha=0.3)
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
