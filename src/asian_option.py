@@ -40,16 +40,19 @@ def price_asian_option(
 
     경로 전체의 평균 가격을 행사가격과 비교해 페이오프를 결정한다.
     """
+    # Asian option은 경로 평균이 payoff 입력이므로 terminal price만으로는 계산할 수 없다.
     paths = simulate_paths(market, contract, sim)  # (n_paths, n_steps+1)
 
     # t=0(S0)을 제외한 t=1..T 구간의 평균 사용
     price_window = paths[:, 1:]
 
+    # 산술평균은 직관적인 평균가격, 기하평균은 로그 평균으로 계산해 해석해 검증에 활용한다.
     if asian.averaging == "arithmetic":
         avg_prices = np.mean(price_window, axis=1)
     else:
         avg_prices = np.exp(np.mean(np.log(price_window), axis=1))
 
+    # 평균가격형 콜/풋 payoff는 평균가격과 행사가격의 차이를 기준으로 결정된다.
     if contract.option_type == "call":
         payoff = np.maximum(avg_prices - contract.strike, 0.0)
     else:
@@ -58,6 +61,7 @@ def price_asian_option(
     discount = exp(-market.rate * contract.maturity)
     discounted = discount * payoff
 
+    # European MC와 동일한 결과 형식을 사용해 가격, 표준오차, 신뢰구간을 일관되게 비교한다.
     price = float(np.mean(discounted))
     stdev = float(np.std(discounted, ddof=1))
     stderr = stdev / sqrt(sim.n_paths)
@@ -90,9 +94,11 @@ def geometric_asian_analytical(
     n = sim.n_steps
 
     # 이산 모니터링 조정 파라미터
+    # 평균을 취하면 원 기초자산보다 유효 변동성이 낮아지므로 조정 변동성 sigma_adj를 사용한다.
     sigma_adj = sigma * sqrt((2 * n + 1) / (6 * (n + 1)))
     r_adj = 0.5 * (r - 0.5 * sigma**2 + sigma_adj**2)
 
+    # 조정된 drift/volatility를 Black-Scholes 형태에 대입해 기하평균 Asian call 가격을 얻는다.
     d1 = (log(S / K) + (r_adj + 0.5 * sigma_adj**2) * T) / (sigma_adj * sqrt(T))
     d2 = d1 - sigma_adj * sqrt(T)
 

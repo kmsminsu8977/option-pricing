@@ -27,10 +27,12 @@ def simulate_paths(
     """
     _validate_inputs(market, contract, sim)
 
+    # 전체 경로가 필요하므로 각 시간 단계별 drift와 diffusion scale을 먼저 고정한다.
     dt = contract.maturity / sim.n_steps
     drift = (market.rate - 0.5 * market.volatility**2) * dt
     diffusion_scale = market.volatility * sqrt(dt)
 
+    # shock 행렬은 경로 수 x 시간 단계 수 형태이며, 한 행이 하나의 가격 경로를 의미한다.
     rng = np.random.default_rng(sim.seed)
     shocks = rng.standard_normal(size=(sim.n_paths, sim.n_steps))
 
@@ -49,4 +51,5 @@ def simulate_paths(
 
 def time_grid(contract: ContractSpec, sim: SimulationSpec) -> np.ndarray:
     """경로에 대응하는 시간 격자(0 ~ T)를 반환한다."""
+    # 가격 배열 열 개수와 정확히 맞추기 위해 n_steps + 1개 점을 생성한다.
     return np.linspace(0.0, contract.maturity, sim.n_steps + 1)

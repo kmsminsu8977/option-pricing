@@ -27,6 +27,7 @@ class BSResult:
 
 def _d1_d2(market: MarketAssumption, contract: ContractSpec) -> tuple[float, float]:
     """d1, d2 보조 변수를 계산한다."""
+    # 기호를 수식 표기와 맞춰 짧은 변수명으로 변환하면 공식 대응 관계가 명확해진다.
     S = market.spot
     K = contract.strike
     r = market.rate
@@ -50,6 +51,7 @@ def bs_price(market: MarketAssumption, contract: ContractSpec) -> BSResult:
     T = contract.maturity
     opt = contract.option_type
 
+    # 변동성이 0이면 확률분포가 퇴화하므로 Black-Scholes d1/d2 대신 할인 내재가치를 반환한다.
     if sigma == 0.0:
         intrinsic = max(S - K, 0.0) if opt == "call" else max(K - S, 0.0)
         return BSResult(price=intrinsic * exp(-r * T), delta=float(S > K), gamma=0.0, vega=0.0, theta=0.0)
@@ -57,6 +59,7 @@ def bs_price(market: MarketAssumption, contract: ContractSpec) -> BSResult:
     d1, d2 = _d1_d2(market, contract)
     disc = exp(-r * T)
 
+    # 콜/풋 가격과 Delta는 payoff 방향이 달라 분기하고, Gamma/Vega는 같은 공식을 공유한다.
     if opt == "call":
         price = S * norm.cdf(d1) - K * disc * norm.cdf(d2)
         delta = float(norm.cdf(d1))
@@ -95,6 +98,7 @@ def bs_put_call_parity_check(
     call_price = bs_price(market, call_spec).price
     put_price = bs_price(market, put_spec).price
 
+    # 좌변은 실제 계산한 콜-풋 가격 차이, 우변은 무차익 parity 이론값이다.
     lhs = call_price - put_price
     rhs = market.spot - strike * exp(-market.rate * maturity)
     error = abs(lhs - rhs)

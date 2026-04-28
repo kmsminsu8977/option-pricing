@@ -14,6 +14,7 @@ from src.monte_carlo_engine import ContractSpec, MarketAssumption, SimulationSpe
 def load_scenarios(path: Path) -> pd.DataFrame:
     """샘플 시나리오 CSV를 로드한다."""
 
+    # CSV 컬럼명을 그대로 유지해 시나리오 입력값을 명시적으로 매핑한다.
     return pd.read_csv(path)
 
 
@@ -22,6 +23,7 @@ def run_experiment(df: pd.DataFrame) -> pd.DataFrame:
 
     rows = []
     for _, row in df.iterrows():
+        # 한 행의 시장 가정, 계약 조건, 시뮬레이션 설정을 각각 명확한 데이터 구조로 분리한다.
         market = MarketAssumption(
             spot=float(row["spot"]),
             rate=float(row["rate"]),
@@ -39,6 +41,7 @@ def run_experiment(df: pd.DataFrame) -> pd.DataFrame:
         )
         result = price_option(market, contract, sim)
 
+        # 결과 테이블은 입력값과 산출값을 함께 남겨 재실행 없이도 조건을 추적할 수 있게 한다.
         rows.append(
             {
                 "scenario_id": row["scenario_id"],
@@ -68,6 +71,7 @@ def save_chart(results: pd.DataFrame, output_path: Path) -> None:
     y = results["price"]
     yerr = [y - results["ci_low"], results["ci_high"] - y]
 
+    # errorbar는 시나리오별 추정 가격과 95% 신뢰구간을 한 화면에서 비교하기 위한 가장 단순한 표현이다.
     plt.errorbar(x, y, yerr=yerr, fmt="o", capsize=4)
     plt.title("Monte Carlo Option Price by Scenario (95% CI)")
     plt.xlabel("Scenario ID")
@@ -79,6 +83,7 @@ def save_chart(results: pd.DataFrame, output_path: Path) -> None:
 
 
 def main() -> None:
+    # 표준 폴더 구조의 입력/출력 경로를 조합해 어느 위치에서 실행해도 같은 산출물을 만든다.
     input_path = SAMPLE_DATA_DIR / "option_scenarios.csv"
     table_path = TABLES_DIR / "pricing_results_sample.csv"
     chart_path = CHARTS_DIR / "pricing_results_sample.png"
@@ -86,6 +91,7 @@ def main() -> None:
     scenarios = load_scenarios(input_path)
     results = run_experiment(scenarios)
 
+    # outputs 하위 폴더가 비어 있거나 새 클론 상태여도 실행이 실패하지 않도록 생성한다.
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 

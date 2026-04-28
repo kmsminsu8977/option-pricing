@@ -46,10 +46,12 @@ def run_convergence_analysis(
         n_paths, price, stderr, ci_low, ci_high, ci_width 컬럼을 가진 DataFrame.
     """
     if path_grid is None:
+        # 작은 경로 수에서 큰 경로 수까지 넓게 잡아 수렴 속도와 계산량 증가를 함께 확인한다.
         path_grid = [100, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000, 100_000]
 
     records = []
     for n in path_grid:
+        # n_paths만 바꾸고 나머지 설정은 고정해 경로 수 변화의 영향만 비교한다.
         sim = SimulationSpec(n_paths=n, n_steps=base_sim.n_steps, seed=base_sim.seed)
         result: PricingResult = price_option(market, contract, sim)
         records.append(
@@ -74,4 +76,5 @@ def theoretical_stderr(
 
     수렴 플롯에서 실제 수렴 속도와 비교하는 기준선으로 사용한다.
     """
+    # 표준오차는 표준편차를 sqrt(N)으로 나눈 값이므로 경로 수가 4배 늘면 절반으로 줄어든다.
     return sample_stdev / np.sqrt(np.array(path_grid, dtype=float))

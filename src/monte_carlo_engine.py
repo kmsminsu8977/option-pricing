@@ -76,6 +76,7 @@ class PricingResult:
 def _validate_inputs(market: MarketAssumption, contract: ContractSpec, sim: SimulationSpec) -> None:
     """입력값 유효성 검사를 수행해 계산 오류를 사전에 방지한다."""
 
+    # 가격, 행사가, 만기처럼 분모나 로그에 들어가는 값은 양수여야 수식이 안정적으로 동작한다.
     if market.spot <= 0:
         raise ValueError("spot은 0보다 커야 합니다.")
     if market.volatility < 0:
@@ -97,13 +98,16 @@ def simulate_terminal_prices(
 
     _validate_inputs(market, contract, sim)
 
+    # 만기를 n_steps로 쪼개 각 단계의 로그수익률 평균과 표준편차를 계산한다.
     dt = contract.maturity / sim.n_steps
     drift = (market.rate - 0.5 * market.volatility**2) * dt
     diffusion_scale = market.volatility * sqrt(dt)
 
+    # seed가 고정된 난수 생성기를 사용해 같은 입력이면 같은 결과가 재현되게 한다.
     rng = np.random.default_rng(sim.seed)
     shocks = rng.standard_normal(size=(sim.n_paths, sim.n_steps))
 
+    # GBM은 로그수익률을 누적한 뒤 지수화하면 terminal price를 직접 얻을 수 있다.
     log_returns = drift + diffusion_scale * shocks
     log_terminal = np.log(market.spot) + np.sum(log_returns, axis=1)
 
@@ -113,6 +117,7 @@ def simulate_terminal_prices(
 def _payoff(terminal_prices: np.ndarray, contract: ContractSpec) -> np.ndarray:
     """옵션 유형에 맞는 만기 페이오프를 계산한다."""
 
+    # 콜은 만기 가격이 행사가를 초과한 부분, 풋은 행사가가 만기 가격을 초과한 부분만 가치가 있다.
     if contract.option_type == "call":
         return np.maximum(terminal_prices - contract.strike, 0.0)
     if contract.option_type == "put":
@@ -127,12 +132,14 @@ def price_option(
 ) -> PricingResult:
     """몬테카를로 방식으로 유럽형 옵션 가격과 95% 신뢰구간을 산출한다."""
 
+    # 1. 만기 가격을 시뮬레이션하고 2. 옵션 payoff를 계산한 뒤 3. 현재가로 할인한다.
     terminal_prices = simulate_terminal_prices(market, contract, sim)
     payoff = _payoff(terminal_prices, contract)
 
     discount = exp(-market.rate * contract.maturity)
     discounted_payoff = discount * payoff
 
+    # 할인 payoff 평균이 MC 가격이며, 표준오차와 95% 신뢰구간으로 추정 불확실성을 함께 기록한다.
     price = float(np.mean(discounted_payoff))
     stdev = float(np.std(discounted_payoff, ddof=1))
     stderr = stdev / sqrt(sim.n_paths)
