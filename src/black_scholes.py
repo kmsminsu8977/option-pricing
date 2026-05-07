@@ -39,11 +39,32 @@ def _d1_d2(market: MarketAssumption, contract: ContractSpec) -> tuple[float, flo
     return d1, d2
 
 
+def _validate_bs_inputs(market: MarketAssumption, contract: ContractSpec) -> None:
+    """Black-Scholes 공식에 들어가는 입력값을 검증한다.
+
+    MC 엔진의 입력 검증과 같은 원칙을 사용하지만, BS 공식은 시뮬레이션 설정이 없으므로
+    시장 가정과 계약 조건만 별도로 확인한다. 로그, 제곱근, 확률분포 함수에 들어가는 값이
+    경제적으로도 수학적으로도 가능한 범위인지 확인하는 단계다.
+    """
+    if market.spot <= 0:
+        raise ValueError("spot은 0보다 커야 합니다.")
+    if market.volatility < 0:
+        raise ValueError("volatility는 음수가 될 수 없습니다.")
+    if contract.strike <= 0:
+        raise ValueError("strike는 0보다 커야 합니다.")
+    if contract.maturity <= 0:
+        raise ValueError("maturity는 0보다 커야 합니다.")
+    if contract.option_type not in {"call", "put"}:
+        raise ValueError("option_type은 'call' 또는 'put' 이어야 합니다.")
+
+
 def bs_price(market: MarketAssumption, contract: ContractSpec) -> BSResult:
     """Black-Scholes 공식으로 유럽형 옵션 가격과 Greeks를 계산한다.
 
-    변동성이 0이면 내재가치(intrinsic value)를 반환한다.
+    변동성이 0이면 위험중립 확정 만기 가격으로 payoff를 계산한 뒤 현재가로 할인한다.
     """
+    _validate_bs_inputs(market, contract)
+
     S = market.spot
     K = contract.strike
     r = market.rate
@@ -51,10 +72,18 @@ def bs_price(market: MarketAssumption, contract: ContractSpec) -> BSResult:
     T = contract.maturity
     opt = contract.option_type
 
-    # 변동성이 0이면 확률분포가 퇴화하므로 Black-Scholes d1/d2 대신 할인 내재가치를 반환한다.
+    # 변동성이 0이면 확률분포가 퇴화하므로 d1/d2가 정의되지 않는다.
+    # 이 경우에는 위험중립 세계의 확정 만기 가격 S_T = S0 * exp(rT)를 직접 payoff에 넣고 할인한다.
+    # 단순 현재 내재가치 max(S0-K, 0)를 할인하면 이자율 효과를 빠뜨리므로 주의한다.
     if sigma == 0.0:
-        intrinsic = max(S - K, 0.0) if opt == "call" else max(K - S, 0.0)
-        return BSResult(price=intrinsic * exp(-r * T), delta=float(S > K), gamma=0.0, vega=0.0, theta=0.0)
+        deterministic_terminal = S * exp(r * T)
+        payoff = (
+            max(deterministic_terminal - K, 0.0)
+            if opt == "call"
+            else max(K - deterministic_terminal, 0.0)
+        )
+        delta = float(deterministic_terminal > K) if opt == "call" else -float(deterministic_terminal < K)
+        return BSResult(price=payoff * exp(-r * T), delta=delta, gamma=0.0, vega=0.0, theta=0.0)
 
     d1, d2 = _d1_d2(market, contract)
     disc = exp(-r * T)

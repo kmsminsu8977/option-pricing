@@ -47,6 +47,15 @@ $$P = C - S_0 + K e^{-rT}$$
 
 이 저장소에서 BS 가격은 MC 결과의 벤치마크로 사용된다.
 
+공식의 각 항을 복습할 때는 별도 노트와 실행 스크립트를 사용한다.
+
+- 복습 노트: [`docs/black_scholes_review.md`](black_scholes_review.md)
+- 복습 입력: `data/sample/black_scholes_review_scenarios.csv`
+- 실행 명령: `python -m src.run_black_scholes_review`
+- 결과 테이블: `outputs/tables/black_scholes_review_results.csv`
+
+결과 테이블은 $d_1$, $d_2$, 할인계수, 기초자산항, 할인 행사가항, Greeks, Put-Call Parity 잔차를 함께 저장한다. 따라서 MC 비교 전에 BS 해석해가 어떤 가정과 계산 순서로 만들어지는지 먼저 점검할 수 있다.
+
 ## 4. Asian Option
 
 경로 평균 가격을 페이오프 기준으로 사용하는 경로의존형 옵션이다.

@@ -20,6 +20,7 @@ option-pricing/
 ├── src/
 │   ├── monte_carlo_engine.py   # GBM terminal price, European MC pricing, CI
 │   ├── black_scholes.py        # BS 해석해, Greeks, Put-Call Parity 검증
+│   ├── black_scholes_review.py # BS 공식 중간항(d1/d2, 가격 분해) 복습 테이블
 │   ├── gbm_paths.py            # 전체 경로 배열 생성 (시각화·경로의존형 옵션용)
 │   ├── asian_option.py         # Arithmetic/Geometric Asian option MC + 해석해
 │   ├── convergence.py          # 경로 수별 수렴 분석
@@ -28,14 +29,16 @@ option-pricing/
 │   ├── 01_gbm_path_simulation.ipynb       # GBM 경로 시각화, 분포 검증
 │   ├── 02_european_option_mc_vs_bs.ipynb  # MC vs BS 벤치마크, 오차 분석
 │   ├── 03_convergence_analysis.ipynb      # 수렴 속도, CI 폭, 목표 정밀도
-│   └── 04_asian_option_pricing.ipynb      # Asian option, European 비교
+│   ├── 04_asian_option_pricing.ipynb      # Asian option, European 비교
+│   └── 05_black_scholes_formula_review.ipynb # BS 공식 분해 복습
 ├── data/
-│   └── sample/option_scenarios.csv        # 재현 가능한 데모 시나리오
+│   └── sample/                            # 재현 가능한 데모/복습 시나리오
 ├── outputs/
 │   ├── charts/                            # 생성된 차트 (PNG)
 │   └── tables/                            # 생성된 결과 테이블 (CSV)
 ├── docs/
-│   └── methodology.md                     # GBM, BS, Asian, 수렴 분석 수식 정리
+│   ├── methodology.md                     # GBM, BS, Asian, 수렴 분석 수식 정리
+│   └── black_scholes_review.md            # BS 가격 공식 복습 노트
 └── requirements.txt
 ```
 
@@ -47,6 +50,7 @@ option-pricing/
 |---|---|
 | `monte_carlo_engine` | GBM 만기 가격 시뮬레이션, 유럽형 콜/풋 MC 가격, 95% CI |
 | `black_scholes` | BS 해석해(콜/풋), Delta/Gamma/Vega/Theta, Put-Call Parity 검증 |
+| `black_scholes_review` | d1/d2, 할인계수, 기초자산항, 할인 행사가항을 분해한 복습용 결과 테이블 |
 | `gbm_paths` | 전체 경로 배열 `(n_paths, n_steps+1)` 생성 |
 | `asian_option` | Arithmetic/Geometric Asian MC, Geometric 해석해(Kemna & Vorst) |
 | `convergence` | 경로 수 격자별 수렴 테이블, 이론 O(1/sqrt(N)) 기준선 |
@@ -65,6 +69,13 @@ pip install -r requirements.txt
 python -m src.run_pricing_experiment
 # → outputs/tables/pricing_results_sample.csv
 # → outputs/charts/pricing_results_sample.png
+```
+
+**Black-Scholes 공식 복습 테이블 생성**
+
+```bash
+python -m src.run_black_scholes_review
+# → outputs/tables/black_scholes_review_results.csv
 ```
 
 **노트북 실행**
@@ -116,6 +127,11 @@ print(f'BS: {bs.price:.4f}  delta={bs.delta:.4f}')
 - 변동성·만기별 Asian/European 가격 비율 분석
 - 경로별 평균 가격 vs 만기 가격 시각화
 
+### 05. Black-Scholes 공식 계산 원리 복습
+- `d1`, `d2`, 할인계수, 가격 분해항을 한 행씩 확인
+- 콜/풋 공식을 `기초자산항`과 `할인 행사가항`으로 비교
+- Greeks와 Put-Call Parity 잔차를 복습 테이블로 점검
+
 ---
 
 ## 주요 결과 (기준 시나리오: S=100, K=100, T=1, r=3%, σ=20%)
@@ -135,8 +151,10 @@ MC 표준오차는 경로 수 N에 대해 O(1/sqrt(N))으로 감소한다.
 ## 방법론
 
 → [`docs/methodology.md`](docs/methodology.md) 참조
+→ [`docs/black_scholes_review.md`](docs/black_scholes_review.md) 참조
 
 GBM 이산화, BS 공식, Asian option 해석해(Kemna & Vorst), 수렴 진단 수식을 정리했다.
+Black-Scholes 복습 노트는 $d_1$, $d_2$, 가격의 두 구성항, Greeks, Put-Call Parity 검증을 실행 코드와 연결한다.
 
 ---
 

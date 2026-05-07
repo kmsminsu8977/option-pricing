@@ -1,0 +1,6 @@
+scenario_id,lesson_focus,option_type,spot,strike,maturity,rate,volatility
+atm_call_base,"ATM 콜: d1/d2와 가격의 두 다리 확인",call,100,100,1.0,0.03,0.20
+atm_put_parity,"같은 조건의 풋: Put-Call Parity 잔차 확인",put,100,100,1.0,0.03,0.20
+itm_call_low_vol,"ITM 콜: 낮은 변동성에서 내재가치 비중 확인",call,112,100,0.5,0.03,0.15
+otm_call_high_vol,"OTM 콜: 높은 변동성이 시간가치를 키우는 효과 확인",call,95,105,1.5,0.03,0.35
+short_put_time_value,"단기 풋: 만기가 짧을 때 d1/d2와 Delta 변화 확인",put,100,105,0.25,0.03,0.20

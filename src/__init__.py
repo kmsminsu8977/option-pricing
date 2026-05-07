@@ -15,6 +15,12 @@ from src.monte_carlo_engine import (
 )
 # Black-Scholes 해석해와 parity 검증 함수는 MC 결과의 benchmark로 사용한다.
 from src.black_scholes import BSResult, bs_price, bs_put_call_parity_check
+# Black-Scholes 복습용 분해 함수는 d1/d2와 가격 구성항을 표로 확인할 때 사용한다.
+from src.black_scholes_review import (
+    BlackScholesStepResult,
+    explain_black_scholes_price,
+    build_black_scholes_review_table,
+)
 # 전체 경로 생성 함수는 시각화와 경로의존형 옵션 계산에서 사용한다.
 from src.gbm_paths import simulate_paths, time_grid
 # Asian option 관련 함수는 평균가격형 payoff 실험을 위해 별도 모듈에서 가져온다.
@@ -33,6 +39,9 @@ __all__ = [
     "BSResult",
     "bs_price",
     "bs_put_call_parity_check",
+    "BlackScholesStepResult",
+    "explain_black_scholes_price",
+    "build_black_scholes_review_table",
     "simulate_paths",
     "time_grid",
     "AsianSpec",
