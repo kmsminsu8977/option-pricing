@@ -18,6 +18,8 @@ env/
 
 # OS / editor
 .DS_Store
+AGENTS.md
+SOURCE.md
 Thumbs.db
 .vscode/
 .idea/
